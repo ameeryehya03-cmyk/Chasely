@@ -1,52 +1,48 @@
-import { google } from 'googleapis';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { accessToken, title, startDateTime, endDateTime, description } = req.body;
+    const { firstName, lastName, email, phone, role, company } = req.body;
 
-    if (!accessToken || !title || !startDateTime) {
+    if (!firstName || !email || !role) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const auth = new google.auth.OAuth2();
-    auth.setCredentials({ access_token: accessToken });
+    const { data: existing } = await supabase
+      .from('leads')
+      .select('id')
+      .eq('email', email.toLowerCase().trim())
+      .single();
 
-    const calendar = google.calendar({ version: 'v3', auth });
+    if (existing) {
+      return res.status(200).json({ success: true, returning: true });
+    }
 
-    const event = await calendar.events.insert({
-      calendarId: 'primary',
-      requestBody: {
-        summary: title,
-        description: description || '',
-        start: {
-          dateTime: startDateTime,
-          timeZone: 'Asia/Dubai'
-        },
-        end: {
-          dateTime: endDateTime,
-          timeZone: 'Asia/Dubai'
-        },
-        reminders: {
-          useDefault: false,
-          overrides: [
-            { method: 'popup', minutes: 30 },
-            { method: 'email', minutes: 60 }
-          ]
-        }
-      }
+    const { error } = await supabase.from('leads').insert({
+      first_name: firstName.trim(),
+      last_name: lastName?.trim() || '',
+      email: email.toLowerCase().trim(),
+      phone: phone?.trim() || '',
+      role: role.trim(),
+      company: company?.trim() || '',
+      source: 'chasely_web',
+      created_at: new Date().toISOString()
     });
 
-    return res.status(200).json({
-      success: true,
-      eventId: event.data.id,
-      eventLink: event.data.htmlLink
-    });
+    if (error) throw error;
+
+    return res.status(200).json({ success: true, returning: false });
 
   } catch (err) {
-    console.error('Calendar error:', err);
-    return res.status(500).json({ error: 'Failed to create calendar event.' });
+    console.error('Signup error:', err);
+    return res.status(500).json({ error: 'Failed to save. Please try again.' });
   }
 }
