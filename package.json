@@ -2,6 +2,7 @@
   "name": "chasely",
   "version": "1.0.0",
   "description": "Never lose a deal to silence",
+  "type": "module",
   "scripts": {
     "dev": "vercel dev",
     "build": "echo 'No build step required'"
