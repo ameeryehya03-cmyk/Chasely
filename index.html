@@ -1,0 +1,44 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
+
+export default async function handler(req, res) {
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
+  // Simple admin password protection
+  const adminKey = req.headers['x-admin-key'];
+  if (adminKey !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const { data: leads, error } = await supabase
+      .from('leads')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (req.query.format === 'csv') {
+      const headers = ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Role', 'Company', 'Source', 'Created At'];
+      const rows = leads.map(l => [
+        l.id, l.first_name, l.last_name, l.email,
+        l.phone, l.role, l.company, l.source, l.created_at
+      ]);
+      const csv = [headers, ...rows].map(r => r.map(v => `"${v || ''}"`).join(',')).join('\n');
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="chasely-leads.csv"');
+      return res.status(200).send(csv);
+    }
+
+    return res.status(200).json({ success: true, count: leads.length, leads });
+
+  } catch (err) {
+    console.error('Leads export error:', err);
+    return res.status(500).json({ error: 'Failed to fetch leads.' });
+  }
+}
