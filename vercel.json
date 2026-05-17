@@ -1,10 +1,6 @@
 {
   "version": 2,
-  "routes": [
-    { "src": "/api/signup", "dest": "/api/signup.js" },
-    { "src": "/api/analyse", "dest": "/api/analyse.js" },
-    { "src": "/api/leads", "dest": "/api/leads.js" },
-    { "src": "/api/calendar", "dest": "/api/calendar.js" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
