@@ -1,59 +1,48 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { createClient } from '@supabase/supabase-js';
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { type, text, imageBase64, mimeType } = req.body;
-    const today = new Date().toISOString().slice(0, 10);
+    const { firstName, lastName, email, phone, role, company } = req.body;
 
-    const systemPrompt = `You are a sales assistant AI. Extract follow-up information from WhatsApp conversations.
-Today is ${today}. Reply ONLY with valid JSON, no markdown, no preamble.
-Return exactly:
-{
-  "clientName": "name of the person who is NOT the sales rep",
-  "followUpDate": "YYYY-MM-DD",
-  "stage": "one short phrase for what is pending (max 6 words)",
-  "eventTitle": "Follow up — [name] re: [topic]",
-  "summary": "2-3 sentences: what was discussed and what action is needed next"
-}
-If a specific follow-up date is mentioned use it. Otherwise suggest 3 business days from today.`;
-
-    let userContent;
-
-    if (type === 'image') {
-      if (!imageBase64 || !mimeType) {
-        return res.status(400).json({ error: 'Missing image data' });
-      }
-      userContent = [
-        {
-          type: 'image',
-          source: { type: 'base64', media_type: mimeType, data: imageBase64 }
-        },
-        { type: 'text', text: 'Extract follow-up details from this WhatsApp screenshot.' }
-      ];
-    } else {
-      if (!text) return res.status(400).json({ error: 'Missing text' });
-      userContent = `Extract follow-up details from this WhatsApp conversation:\n\n${text}`;
+    if (!firstName || !email || !role) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const message = await client.messages.create({
-      model: 'claude-sonnet-4-5',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userContent }]
+    const { data: existing } = await supabase
+      .from('leads')
+      .select('id')
+      .eq('email', email.toLowerCase().trim())
+      .single();
+
+    if (existing) {
+      return res.status(200).json({ success: true, returning: true });
+    }
+
+    const { error } = await supabase.from('leads').insert({
+      first_name: firstName.trim(),
+      last_name: lastName?.trim() || '',
+      email: email.toLowerCase().trim(),
+      phone: phone?.trim() || '',
+      role: role.trim(),
+      company: company?.trim() || '',
+      source: 'chasely_web',
+      created_at: new Date().toISOString()
     });
 
-    const raw = message.content.find(b => b.type === 'text')?.text || '';
-    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    if (error) throw error;
 
-    return res.status(200).json({ success: true, data: parsed });
+    return res.status(200).json({ success: true, returning: false });
 
   } catch (err) {
-    console.error('Analyse error:', err);
-    return res.status(500).json({ error: 'Analysis failed. Please try again.' });
+    console.error('Signup error:', err);
+    return res.status(500).json({ error: 'Failed to save. Please try again.' });
   }
 }
