@@ -1,12 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "echo 'no build'",
   "outputDirectory": "public",
-  "functions": {
-    "api/*.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "routes": [
     { "src": "/api/signup", "dest": "/api/signup.js" },
     { "src": "/api/analyse", "dest": "/api/analyse.js" },
