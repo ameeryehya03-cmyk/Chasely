@@ -1,44 +1,344 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
-
-export default async function handler(req, res) {
-  if (req.method === 'OPTIONS') return res.status(200).end();
-
-  // Simple admin password protection
-  const adminKey = req.headers['x-admin-key'];
-  if (adminKey !== process.env.ADMIN_SECRET) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  try {
-    const { data: leads, error } = await supabase
-      .from('leads')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    if (req.query.format === 'csv') {
-      const headers = ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Role', 'Company', 'Source', 'Created At'];
-      const rows = leads.map(l => [
-        l.id, l.first_name, l.last_name, l.email,
-        l.phone, l.role, l.company, l.source, l.created_at
-      ]);
-      const csv = [headers, ...rows].map(r => r.map(v => `"${v || ''}"`).join(',')).join('\n');
-
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename="chasely-leads.csv"');
-      return res.status(200).send(csv);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chasely — Never lose a deal to silence</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --surface: #13131a; --border: #1e1e2e;
+      --accent: #6c63ff; --accent-light: #8b85ff; --text: #e8e8f0;
+      --muted: #6b6b80; --success: #22c55e; --danger: #ef4444; --radius: 12px;
     }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+    #landing { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(108,99,255,0.18) 0%, transparent 70%); }
+    .logo { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.25rem; }
+    .logo span { color: var(--accent); }
+    .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 3rem; }
+    h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -1px; line-height: 1.15; margin-bottom: 1rem; max-width: 700px; }
+    h1 em { font-style: normal; color: var(--accent-light); }
+    .sub { color: var(--muted); font-size: 1.1rem; max-width: 500px; margin: 0 auto 3rem; }
+    .features { display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 3.5rem; }
+    .feature { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.4rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; width: 100%; max-width: 460px; text-align: left; }
+    .card h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.75rem; }
+    .field label { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+    input, select { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.95rem; padding: 0.65rem 0.85rem; width: 100%; outline: none; transition: border-color 0.15s; }
+    input:focus, select:focus { border-color: var(--accent); }
+    input::placeholder { color: var(--muted); }
+    select option { background: var(--surface); }
+    .btn { display: block; width: 100%; padding: 0.8rem; border: none; border-radius: 8px; background: var(--accent); color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.15s; margin-top: 0.5rem; }
+    .btn:hover { background: var(--accent-light); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .error-msg { color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; }
+    #app { display: none; }
+    .app-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; border-bottom: 1px solid var(--border); background: var(--surface); }
+    .app-logo { font-size: 1.3rem; font-weight: 800; }
+    .app-logo span { color: var(--accent); }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+    .user-pill { background: var(--border); border-radius: 99px; padding: 0.3rem 0.9rem; font-size: 0.8rem; color: var(--muted); }
+    .signout-btn { background: none; border: none; color: var(--muted); font-size: 0.8rem; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 6px; }
+    .signout-btn:hover { color: var(--text); }
+    .app-main { max-width: 760px; margin: 2.5rem auto; padding: 0 1.5rem; }
+    .app-main h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .app-main .desc { color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; }
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.35rem; width: fit-content; }
+    .tab { padding: 0.5rem 1.2rem; border-radius: 7px; border: none; background: none; color: var(--muted); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .tab.active { background: var(--accent); color: #fff; }
+    .input-panel { display: none; }
+    .input-panel.active { display: block; }
+    textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 0.95rem; font-family: inherit; padding: 1rem; resize: vertical; min-height: 180px; outline: none; transition: border-color 0.15s; }
+    textarea:focus { border-color: var(--accent); }
+    textarea::placeholder { color: var(--muted); }
+    .drop-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 3rem 2rem; text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: rgba(108,99,255,0.05); }
+    .drop-zone .dz-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .drop-zone p { color: var(--muted); font-size: 0.95rem; }
+    .drop-zone strong { color: var(--accent); }
+    #preview-img { max-width: 100%; border-radius: var(--radius); margin-top: 1rem; display: none; border: 1px solid var(--border); }
+    .analyse-btn { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.85rem; border: none; border-radius: 8px; background: var(--accent); color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1rem; transition: background 0.15s; }
+    .analyse-btn:hover { background: var(--accent-light); }
+    .analyse-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #result-card { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; margin-top: 2rem; }
+    #result-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; }
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
+    .result-field .label { font-size: 0.75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+    .result-field .value { font-size: 0.95rem; font-weight: 500; }
+    .summary-field { grid-column: 1 / -1; }
+    .summary-field .value { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+    .badge { display: inline-block; background: rgba(108,99,255,0.15); color: var(--accent-light); border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.8rem; font-weight: 600; }
+    .calendar-section { border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 0.25rem; }
+    .calendar-section h4 { font-size: 0.9rem; font-weight: 600; color: var(--muted); margin-bottom: 0.75rem; }
+    .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .cal-btn { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.75rem; border: none; border-radius: 8px; background: #1a7340; color: #fff; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .cal-btn:hover { background: #1f8f4e; }
+    .cal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .cal-success { display: flex; align-items: center; gap: 0.6rem; color: var(--success); font-size: 0.9rem; font-weight: 500; padding: 0.75rem; background: rgba(34,197,94,0.08); border-radius: 8px; margin-top: 0.5rem; }
+    .cal-success a { color: var(--success); }
+    #toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(4rem); background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1.25rem; font-size: 0.9rem; box-shadow: 0 8px 32px rgba(0,0,0,0.4); transition: transform 0.25s ease, opacity 0.25s; opacity: 0; pointer-events: none; z-index: 999; }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    #toast.error { border-color: var(--danger); color: var(--danger); }
+    @media (max-width: 520px) { .result-grid, .time-row, .row { grid-template-columns: 1fr; } .app-header { padding: 0.75rem 1rem; } }
+  </style>
+</head>
+<body>
 
-    return res.status(200).json({ success: true, count: leads.length, leads });
+<section id="landing">
+  <div class="logo">Chase<span>ly</span></div>
+  <p class="tagline">Never lose a deal to silence</p>
+  <h1>Turn WhatsApp chats into<br><em>calendar follow-ups</em></h1>
+  <p class="sub">Paste a conversation or drop a screenshot. Chasely reads it, extracts the deal details, and books the reminder — in seconds.</p>
+  <div class="features">
+    <div class="feature"><span>💬</span> Paste text or screenshot</div>
+    <div class="feature"><span>🤖</span> AI extracts deal details</div>
+    <div class="feature"><span>📅</span> One-click Google Calendar</div>
+  </div>
+  <div class="card">
+    <h2>Get early access</h2>
+    <p>Free for sales professionals during beta.</p>
+    <form id="signup-form">
+      <div class="row">
+        <div class="field"><label>First name *</label><input type="text" id="f-first" placeholder="Ahmed" required /></div>
+        <div class="field"><label>Last name</label><input type="text" id="f-last" placeholder="Al-Rashid" /></div>
+      </div>
+      <div class="field"><label>Work email *</label><input type="email" id="f-email" placeholder="ahmed@company.com" required /></div>
+      <div class="row">
+        <div class="field"><label>Phone</label><input type="tel" id="f-phone" placeholder="+971 50 000 0000" /></div>
+        <div class="field">
+          <label>Role *</label>
+          <select id="f-role" required>
+            <option value="">Select…</option>
+            <option>Sales Rep</option>
+            <option>Account Executive</option>
+            <option>BDR / SDR</option>
+            <option>Sales Manager</option>
+            <option>Founder / CEO</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Company</label><input type="text" id="f-company" placeholder="Acme Corp" /></div>
+      <button type="submit" class="btn" id="signup-btn">Get started →</button>
+      <div id="signup-error" class="error-msg"></div>
+    </form>
+  </div>
+</section>
 
-  } catch (err) {
-    console.error('Leads export error:', err);
-    return res.status(500).json({ error: 'Failed to fetch leads.' });
+<div id="app">
+  <header class="app-header">
+    <div class="app-logo">Chase<span>ly</span></div>
+    <div class="header-right">
+      <span class="user-pill" id="user-email-pill"></span>
+      <button class="signout-btn" onclick="signOut()">Sign out</button>
+    </div>
+  </header>
+  <main class="app-main">
+    <h2>Analyse a conversation</h2>
+    <p class="desc">Paste your WhatsApp chat or upload a screenshot and Chasely will extract the follow-up details instantly.</p>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('text',this)">Paste text</button>
+      <button class="tab" onclick="switchTab('image',this)">Screenshot</button>
+    </div>
+    <div class="input-panel active" id="panel-text">
+      <textarea id="chat-text" placeholder="Paste your WhatsApp conversation here…"></textarea>
+    </div>
+    <div class="input-panel" id="panel-image">
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('img-input').click()">
+        <div class="dz-icon">📷</div>
+        <p><strong>Click to upload</strong> or drag &amp; drop</p>
+        <p style="font-size:0.8rem;margin-top:0.3rem">PNG, JPG, WEBP · max 5 MB</p>
+      </div>
+      <input type="file" id="img-input" accept="image/*" style="display:none" />
+      <img id="preview-img" alt="Preview" />
+    </div>
+    <button class="analyse-btn" id="analyse-btn" onclick="analyse()">
+      <span id="btn-label">Analyse conversation</span>
+    </button>
+    <div id="result-card">
+      <h3>✅ Follow-up details</h3>
+      <div class="result-grid">
+        <div class="result-field"><div class="label">Client</div><div class="value" id="r-client">—</div></div>
+        <div class="result-field"><div class="label">Follow-up date</div><div class="value" id="r-date">—</div></div>
+        <div class="result-field"><div class="label">Stage</div><div class="value"><span class="badge" id="r-stage">—</span></div></div>
+        <div class="result-field"><div class="label">Calendar title</div><div class="value" id="r-title" style="font-size:0.85rem">—</div></div>
+        <div class="result-field summary-field"><div class="label">Summary</div><div class="value" id="r-summary">—</div></div>
+      </div>
+      <div class="calendar-section">
+        <h4>📅 Add to Google Calendar</h4>
+        <div id="cal-auth-section">
+          <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.75rem">Connect your Google account to create the reminder automatically.</p>
+          <button class="cal-btn" onclick="connectGoogle()">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+            Connect Google Calendar
+          </button>
+        </div>
+        <div id="cal-ready-section" style="display:none">
+          <div class="time-row">
+            <div class="field"><label>Start time</label><input type="datetime-local" id="cal-start" /></div>
+            <div class="field"><label>End time</label><input type="datetime-local" id="cal-end" /></div>
+          </div>
+          <button class="cal-btn" id="cal-create-btn" onclick="createEvent()">📅 Create calendar reminder</button>
+          <div id="cal-success-msg" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+  let currentUser = null, googleAccessToken = null, analysisResult = null;
+  let activeTab = 'text', imageBase64 = null, imageMimeType = null;
+
+  function loadUser() {
+    try { currentUser = JSON.parse(localStorage.getItem('chasely_user')); } catch {}
+    if (currentUser) showApp();
   }
-}
+  function saveUser(u) { currentUser = u; localStorage.setItem('chasely_user', JSON.stringify(u)); }
+  function signOut() {
+    localStorage.removeItem('chasely_user');
+    currentUser = null; googleAccessToken = null; analysisResult = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('landing').style.display = 'flex';
+  }
+  function showApp() {
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('user-email-pill').textContent = currentUser.email;
+  }
+
+  document.getElementById('signup-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('signup-btn');
+    const errEl = document.getElementById('signup-error');
+    errEl.textContent = ''; btn.disabled = true; btn.textContent = 'Saving…';
+    const body = {
+      firstName: document.getElementById('f-first').value.trim(),
+      lastName: document.getElementById('f-last').value.trim(),
+      email: document.getElementById('f-email').value.trim(),
+      phone: document.getElementById('f-phone').value.trim(),
+      role: document.getElementById('f-role').value,
+      company: document.getElementById('f-company').value.trim(),
+    };
+    try {
+      const res = await fetch('/api/signup', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Signup failed');
+      saveUser({ email: body.email, firstName: body.firstName });
+      showApp();
+    } catch (err) {
+      errEl.textContent = err.message; btn.disabled = false; btn.textContent = 'Get started →';
+    }
+  });
+
+  function switchTab(tab, el) {
+    activeTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); el.classList.add('active');
+    document.querySelectorAll('.input-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+  }
+
+  const dropZone = document.getElementById('drop-zone');
+  const imgInput = document.getElementById('img-input');
+  const previewImg = document.getElementById('preview-img');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); if (e.dataTransfer.files[0]) handleImage(e.dataTransfer.files[0]); });
+  imgInput.addEventListener('change', () => { if (imgInput.files[0]) handleImage(imgInput.files[0]); });
+  function handleImage(file) {
+    if (!file.type.startsWith('image/')) { showToast('Please select an image file', true); return; }
+    if (file.size > 5*1024*1024) { showToast('Image must be under 5 MB', true); return; }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      imageBase64 = ev.target.result.split(',')[1]; imageMimeType = file.type;
+      previewImg.src = ev.target.result; previewImg.style.display = 'block'; dropZone.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function analyse() {
+    const btn = document.getElementById('analyse-btn');
+    const label = document.getElementById('btn-label');
+    let body;
+    if (activeTab === 'text') {
+      const text = document.getElementById('chat-text').value.trim();
+      if (!text) { showToast('Please paste a conversation first', true); return; }
+      body = { type: 'text', text };
+    } else {
+      if (!imageBase64) { showToast('Please upload a screenshot first', true); return; }
+      body = { type: 'image', imageBase64, mimeType: imageMimeType };
+    }
+    btn.disabled = true; label.innerHTML = '<span class="spinner"></span> Analysing…';
+    document.getElementById('result-card').style.display = 'none';
+    try {
+      const res = await fetch('/api/analyse', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Analysis failed');
+      analysisResult = data.data; showResult(analysisResult);
+    } catch (err) { showToast(err.message, true); }
+    finally { btn.disabled = false; label.textContent = 'Analyse conversation'; }
+  }
+
+  function showResult(d) {
+    document.getElementById('r-client').textContent = d.clientName || '—';
+    document.getElementById('r-date').textContent = d.followUpDate ? new Date(d.followUpDate+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long',year:'numeric'}) : '—';
+    document.getElementById('r-stage').textContent = d.stage || '—';
+    document.getElementById('r-title').textContent = d.eventTitle || '—';
+    document.getElementById('r-summary').textContent = d.summary || '—';
+    if (d.followUpDate) { document.getElementById('cal-start').value = d.followUpDate+'T09:00'; document.getElementById('cal-end').value = d.followUpDate+'T09:30'; }
+    if (googleAccessToken) { document.getElementById('cal-auth-section').style.display='none'; document.getElementById('cal-ready-section').style.display='block'; }
+    document.getElementById('result-card').style.display = 'block';
+    document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function connectGoogle() {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: 'YOUR_GOOGLE_CLIENT_ID',
+      scope: 'https://www.googleapis.com/auth/calendar.events',
+      callback: resp => {
+        if (resp.access_token) {
+          googleAccessToken = resp.access_token;
+          document.getElementById('cal-auth-section').style.display = 'none';
+          document.getElementById('cal-ready-section').style.display = 'block';
+          showToast('Google Calendar connected ✓');
+        }
+      }
+    });
+    client.requestAccessToken();
+  }
+
+  async function createEvent() {
+    if (!analysisResult || !googleAccessToken) return;
+    const btn = document.getElementById('cal-create-btn');
+    btn.disabled = true; btn.textContent = 'Creating…';
+    const start = document.getElementById('cal-start').value;
+    const end = document.getElementById('cal-end').value;
+    if (!start || !end) { showToast('Please set start and end times', true); btn.disabled=false; btn.textContent='📅 Create calendar reminder'; return; }
+    try {
+      const res = await fetch('/api/calendar', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ accessToken: googleAccessToken, title: analysisResult.eventTitle, startDateTime: new Date(start).toISOString(), endDateTime: new Date(end).toISOString(), description: analysisResult.summary }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create event');
+      const msg = document.getElementById('cal-success-msg');
+      msg.style.display='flex'; msg.className='cal-success';
+      msg.innerHTML = `✅ Event created! <a href="${data.eventLink}" target="_blank" rel="noopener">Open in Google Calendar →</a>`;
+      btn.style.display='none'; showToast('Calendar event created!');
+    } catch (err) { showToast(err.message, true); btn.disabled=false; btn.textContent='📅 Create calendar reminder'; }
+  }
+
+  function showToast(msg, isError=false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'show'+(isError?' error':'');
+    clearTimeout(t._timer); t._timer = setTimeout(() => { t.className=''; }, 3000);
+  }
+
+  loadUser();
+</script>
+</body>
+</html>
