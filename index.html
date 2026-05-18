@@ -322,12 +322,22 @@
     const end = document.getElementById('cal-end').value;
     if (!start || !end) { showToast('Please set start and end times', true); btn.disabled=false; btn.textContent='📅 Create calendar reminder'; return; }
     try {
-      const res = await fetch('/api/calendar', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ accessToken: googleAccessToken, title: analysisResult.eventTitle, startDateTime: new Date(start).toISOString(), endDateTime: new Date(end).toISOString(), description: analysisResult.summary }) });
+      const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${googleAccessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          summary: analysisResult.eventTitle,
+          description: analysisResult.summary || '',
+          start: { dateTime: new Date(start).toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+          end: { dateTime: new Date(end).toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+          reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: 30 }, { method: 'email', minutes: 60 }] }
+        })
+      });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to create event');
+      if (!res.ok) throw new Error(data.error?.message || 'Failed to create event');
       const msg = document.getElementById('cal-success-msg');
       msg.style.display='flex'; msg.className='cal-success';
-      msg.innerHTML = `✅ Event created! <a href="${data.eventLink}" target="_blank" rel="noopener">Open in Google Calendar →</a>`;
+      msg.innerHTML = `✅ Event created! <a href="${data.htmlLink}" target="_blank" rel="noopener">Open in Google Calendar →</a>`;
       btn.style.display='none'; showToast('Calendar event created!');
     } catch (err) { showToast(err.message, true); btn.disabled=false; btn.textContent='📅 Create calendar reminder'; }
   }
