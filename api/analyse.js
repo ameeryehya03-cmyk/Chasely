@@ -18,21 +18,21 @@ Return exactly:
   "followUpDate": "YYYY-MM-DD",
   "stage": "one short phrase for what is pending (max 6 words)",
   "eventTitle": "Follow up — [name] re: [topic]",
-  "summary": "2-3 sentences: what was discussed and what action is needed next"
+  "summary": "2-3 sentences: what was discussed and what action is needed next",
+  "temperature": "Hot",
+  "followUpMessage": "A short natural WhatsApp message (2-3 sentences max) the sales rep sends on the follow-up date. Use the client first name. Sound human, like a real salesperson — not robotic or formal. Reference what was discussed."
 }
+Temperature rules — pick exactly one:
+- "Hot": deal likely to close soon, clear next steps, strong engagement from client
+- "Warm": client is interested but delayed, waiting on something, moderate engagement
+- "Cold": client is unresponsive, vague, long timeline, or low engagement
 If a specific follow-up date is mentioned use it. Otherwise suggest 3 business days from today.`;
 
     let userContent;
-
     if (type === 'image') {
-      if (!imageBase64 || !mimeType) {
-        return res.status(400).json({ error: 'Missing image data' });
-      }
+      if (!imageBase64 || !mimeType) return res.status(400).json({ error: 'Missing image data' });
       userContent = [
-        {
-          type: 'image',
-          source: { type: 'base64', media_type: mimeType, data: imageBase64 }
-        },
+        { type: 'image', source: { type: 'base64', media_type: mimeType, data: imageBase64 } },
         { type: 'text', text: 'Extract follow-up details from this WhatsApp screenshot.' }
       ];
     } else {

@@ -12,6 +12,8 @@
       --muted: #6b6b80; --success: #22c55e; --danger: #ef4444; --radius: 12px;
     }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+
+    /* ── LANDING ── */
     #landing { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(108,99,255,0.18) 0%, transparent 70%); }
     .logo { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.25rem; }
     .logo span { color: var(--accent); }
@@ -35,20 +37,30 @@
     .btn:hover { background: var(--accent-light); }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .error-msg { color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; }
+
+    /* ── APP SHELL ── */
     #app { display: none; }
-    .app-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; border-bottom: 1px solid var(--border); background: var(--surface); }
-    .app-logo { font-size: 1.3rem; font-weight: 800; }
+    .app-header { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--surface); flex-wrap: wrap; }
+    .app-logo { font-size: 1.3rem; font-weight: 800; flex-shrink: 0; }
     .app-logo span { color: var(--accent); }
-    .header-right { display: flex; align-items: center; gap: 1rem; }
+    .app-nav { display: flex; gap: 0.25rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.25rem; }
+    .nav-tab { padding: 0.4rem 1rem; border-radius: 6px; border: none; background: none; color: var(--muted); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .nav-tab.active { background: var(--accent); color: #fff; }
+    .header-right { display: flex; align-items: center; gap: 0.75rem; margin-left: auto; flex-wrap: wrap; }
+    .streak-badge { display: none; background: rgba(255,165,0,0.15); color: #ffa500; border-radius: 99px; padding: 0.25rem 0.7rem; font-size: 0.8rem; font-weight: 700; }
+    .share-btn { background: #25d366; color: #fff; border: none; border-radius: 8px; padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.35rem; transition: background 0.15s; white-space: nowrap; }
+    .share-btn:hover { background: #1ebe5d; }
     .user-pill { background: var(--border); border-radius: 99px; padding: 0.3rem 0.9rem; font-size: 0.8rem; color: var(--muted); }
     .signout-btn { background: none; border: none; color: var(--muted); font-size: 0.8rem; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 6px; }
     .signout-btn:hover { color: var(--text); }
+
+    /* ── ANALYSE VIEW ── */
     .app-main { max-width: 760px; margin: 2.5rem auto; padding: 0 1.5rem; }
     .app-main h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.4rem; }
     .app-main .desc { color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; }
-    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.35rem; width: fit-content; }
-    .tab { padding: 0.5rem 1.2rem; border-radius: 7px; border: none; background: none; color: var(--muted); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
-    .tab.active { background: var(--accent); color: #fff; }
+    .input-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.35rem; width: fit-content; }
+    .input-tab { padding: 0.5rem 1.2rem; border-radius: 7px; border: none; background: none; color: var(--muted); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .input-tab.active { background: var(--accent); color: #fff; }
     .input-panel { display: none; }
     .input-panel.active { display: block; }
     textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 0.95rem; font-family: inherit; padding: 1rem; resize: vertical; min-height: 180px; outline: none; transition: border-color 0.15s; }
@@ -65,6 +77,8 @@
     .analyse-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── RESULT CARD ── */
     #result-card { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; margin-top: 2rem; }
     #result-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; }
     .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
@@ -73,6 +87,25 @@
     .summary-field { grid-column: 1 / -1; }
     .summary-field .value { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
     .badge { display: inline-block; background: rgba(108,99,255,0.15); color: var(--accent-light); border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.8rem; font-weight: 600; }
+
+    /* Temperature badges */
+    .temp-hot { display: inline-block; background: rgba(239,68,68,0.15); color: #f87171; border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.85rem; font-weight: 700; }
+    .temp-warm { display: inline-block; background: rgba(245,158,11,0.15); color: #fbbf24; border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.85rem; font-weight: 700; }
+    .temp-cold { display: inline-block; background: rgba(96,165,250,0.15); color: #93c5fd; border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.85rem; font-weight: 700; }
+
+    /* Follow-up message card */
+    .followup-section { border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 0.25rem; }
+    .followup-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+    .followup-header span { font-size: 0.9rem; font-weight: 600; color: var(--muted); }
+    .copy-btn { background: var(--border); border: none; color: var(--text); border-radius: 6px; padding: 0.3rem 0.75rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+    .copy-btn:hover { background: #2a2a3e; }
+    .followup-msg-box { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; font-size: 0.9rem; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
+
+    /* Pipeline add button */
+    .pipeline-add-btn { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.65rem; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--muted); font-size: 0.9rem; font-weight: 500; cursor: pointer; margin-top: 0.75rem; transition: all 0.15s; }
+    .pipeline-add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Calendar section */
     .calendar-section { border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 0.25rem; }
     .calendar-section h4 { font-size: 0.9rem; font-weight: 600; color: var(--muted); margin-bottom: 0.75rem; }
     .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
@@ -81,14 +114,46 @@
     .cal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .cal-success { display: flex; align-items: center; gap: 0.6rem; color: var(--success); font-size: 0.9rem; font-weight: 500; padding: 0.75rem; background: rgba(34,197,94,0.08); border-radius: 8px; margin-top: 0.5rem; }
     .cal-success a { color: var(--success); }
-    #toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(4rem); background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1.25rem; font-size: 0.9rem; box-shadow: 0 8px 32px rgba(0,0,0,0.4); transition: transform 0.25s ease, opacity 0.25s; opacity: 0; pointer-events: none; z-index: 999; }
+
+    /* ── PIPELINE VIEW ── */
+    #view-pipeline { padding: 1.5rem; overflow-x: auto; }
+    .pipeline-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .pipeline-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .kanban-board { display: flex; gap: 1rem; min-width: max-content; padding-bottom: 1rem; }
+    .kanban-col { width: 240px; flex-shrink: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+    .col-header { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 0.5rem 0.25rem; display: flex; align-items: center; justify-content: space-between; }
+    .col-count { background: var(--border); color: var(--muted); border-radius: 99px; padding: 0.1rem 0.5rem; font-size: 0.75rem; }
+    .col-body { min-height: 120px; background: rgba(255,255,255,0.02); border: 1px dashed var(--border); border-radius: var(--radius); padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; transition: background 0.15s, border-color 0.15s; }
+    .col-body.drag-over { background: rgba(108,99,255,0.06); border-color: var(--accent); }
+    .pipeline-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem; cursor: grab; transition: box-shadow 0.15s, transform 0.1s; user-select: none; }
+    .pipeline-card:active { cursor: grabbing; }
+    .pipeline-card.dragging { opacity: 0.4; }
+    .pipeline-card .pc-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .pipeline-card .pc-stage { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; }
+    .pipeline-card .pc-date { font-size: 0.75rem; color: var(--muted); }
+    .pipeline-card .pc-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem; }
+    .pc-delete { background: none; border: none; color: var(--muted); font-size: 0.75rem; cursor: pointer; padding: 0.1rem 0.3rem; border-radius: 4px; }
+    .pc-delete:hover { color: var(--danger); background: rgba(239,68,68,0.1); }
+    .empty-pipeline { text-align: center; color: var(--muted); padding: 3rem 1rem; font-size: 0.9rem; grid-column: 1/-1; }
+
+    /* ── TOAST ── */
+    #toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(4rem); background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1.25rem; font-size: 0.9rem; box-shadow: 0 8px 32px rgba(0,0,0,0.4); transition: transform 0.25s ease, opacity 0.25s; opacity: 0; pointer-events: none; z-index: 999; max-width: 90vw; text-align: center; }
     #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     #toast.error { border-color: var(--danger); color: var(--danger); }
-    @media (max-width: 520px) { .result-grid, .time-row, .row { grid-template-columns: 1fr; } .app-header { padding: 0.75rem 1rem; } }
+    #toast.success { border-color: var(--success); color: var(--success); }
+
+    @media (max-width: 600px) {
+      .result-grid, .time-row, .row { grid-template-columns: 1fr; }
+      .app-header { padding: 0.75rem 1rem; }
+      .app-main { margin-top: 1.5rem; }
+      .header-right { gap: 0.5rem; }
+      .user-pill { display: none; }
+    }
   </style>
 </head>
 <body>
 
+<!-- ════ LANDING ════ -->
 <section id="landing">
   <div class="logo">Chase<span>ly</span></div>
   <p class="tagline">Never lose a deal to silence</p>
@@ -130,73 +195,143 @@
   </div>
 </section>
 
+<!-- ════ APP ════ -->
 <div id="app">
   <header class="app-header">
     <div class="app-logo">Chase<span>ly</span></div>
+    <nav class="app-nav">
+      <button class="nav-tab active" onclick="showView('analyse', this)">Analyse</button>
+      <button class="nav-tab" onclick="showView('pipeline', this)">Pipeline</button>
+    </nav>
     <div class="header-right">
+      <span id="streak-badge" class="streak-badge"></span>
+      <button class="share-btn" onclick="shareWhatsApp()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Share Chasely
+      </button>
       <span class="user-pill" id="user-email-pill"></span>
       <button class="signout-btn" onclick="signOut()">Sign out</button>
     </div>
   </header>
-  <main class="app-main">
-    <h2>Analyse a conversation</h2>
-    <p class="desc">Paste your WhatsApp chat or upload a screenshot and Chasely will extract the follow-up details instantly.</p>
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('text',this)">Paste text</button>
-      <button class="tab" onclick="switchTab('image',this)">Screenshot</button>
-    </div>
-    <div class="input-panel active" id="panel-text">
-      <textarea id="chat-text" placeholder="Paste your WhatsApp conversation here…"></textarea>
-    </div>
-    <div class="input-panel" id="panel-image">
-      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('img-input').click()">
-        <div class="dz-icon">📷</div>
-        <p><strong>Click to upload</strong> or drag &amp; drop</p>
-        <p style="font-size:0.8rem;margin-top:0.3rem">PNG, JPG, WEBP · max 5 MB</p>
+
+  <!-- ── Analyse View ── -->
+  <div id="view-analyse">
+    <main class="app-main">
+      <h2>Analyse a conversation</h2>
+      <p class="desc">Paste your WhatsApp chat or upload a screenshot and Chasely will extract the follow-up details instantly.</p>
+      <div class="input-tabs">
+        <button class="input-tab active" onclick="switchTab('text', this)">Paste text</button>
+        <button class="input-tab" onclick="switchTab('image', this)">Screenshot</button>
       </div>
-      <input type="file" id="img-input" accept="image/*" style="display:none" />
-      <img id="preview-img" alt="Preview" />
-    </div>
-    <button class="analyse-btn" id="analyse-btn" onclick="analyse()">
-      <span id="btn-label">Analyse conversation</span>
-    </button>
-    <div id="result-card">
-      <h3>✅ Follow-up details</h3>
-      <div class="result-grid">
-        <div class="result-field"><div class="label">Client</div><div class="value" id="r-client">—</div></div>
-        <div class="result-field"><div class="label">Follow-up date</div><div class="value" id="r-date">—</div></div>
-        <div class="result-field"><div class="label">Stage</div><div class="value"><span class="badge" id="r-stage">—</span></div></div>
-        <div class="result-field"><div class="label">Calendar title</div><div class="value" id="r-title" style="font-size:0.85rem">—</div></div>
-        <div class="result-field summary-field"><div class="label">Summary</div><div class="value" id="r-summary">—</div></div>
+      <div class="input-panel active" id="panel-text">
+        <textarea id="chat-text" placeholder="Paste your WhatsApp conversation here…"></textarea>
       </div>
-      <div class="calendar-section">
-        <h4>📅 Add to Google Calendar</h4>
-        <div id="cal-auth-section">
-          <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.75rem">Connect your Google account to create the reminder automatically.</p>
-          <button class="cal-btn" onclick="connectGoogle()">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
-            Connect Google Calendar
-          </button>
+      <div class="input-panel" id="panel-image">
+        <div class="drop-zone" id="drop-zone" onclick="document.getElementById('img-input').click()">
+          <div class="dz-icon">📷</div>
+          <p><strong>Click to upload</strong> or drag &amp; drop</p>
+          <p style="font-size:0.8rem;margin-top:0.3rem">PNG, JPG, WEBP · max 5 MB</p>
         </div>
-        <div id="cal-ready-section" style="display:none">
-          <div class="time-row">
-            <div class="field"><label>Start time</label><input type="datetime-local" id="cal-start" /></div>
-            <div class="field"><label>End time</label><input type="datetime-local" id="cal-end" /></div>
+        <input type="file" id="img-input" accept="image/*" style="display:none" />
+        <img id="preview-img" alt="Preview" />
+      </div>
+      <button class="analyse-btn" id="analyse-btn" onclick="analyse()">
+        <span id="btn-label">Analyse conversation</span>
+      </button>
+
+      <!-- Result card -->
+      <div id="result-card">
+        <h3>✅ Follow-up details</h3>
+        <div class="result-grid">
+          <div class="result-field"><div class="label">Client</div><div class="value" id="r-client">—</div></div>
+          <div class="result-field"><div class="label">Follow-up date</div><div class="value" id="r-date">—</div></div>
+          <div class="result-field"><div class="label">Stage</div><div class="value"><span class="badge" id="r-stage">—</span></div></div>
+          <div class="result-field"><div class="label">Lead temperature</div><div class="value" id="r-temp">—</div></div>
+          <div class="result-field summary-field"><div class="label">Summary</div><div class="value" id="r-summary">—</div></div>
+        </div>
+
+        <!-- Follow-up message -->
+        <div class="followup-section" id="followup-section" style="display:none">
+          <div class="followup-header">
+            <span>💬 Suggested WhatsApp message</span>
+            <button class="copy-btn" onclick="copyFollowUp()">Copy</button>
           </div>
-          <button class="cal-btn" id="cal-create-btn" onclick="addToCalendar()">📅 Create calendar reminder</button>
-          <div id="cal-success-msg" style="display:none"></div>
+          <div class="followup-msg-box" id="followup-msg-text"></div>
+        </div>
+
+        <!-- Add to pipeline -->
+        <button class="pipeline-add-btn" id="pipeline-add-btn" onclick="addToPipeline()" style="display:none">
+          + Add to Pipeline
+        </button>
+
+        <!-- Calendar section -->
+        <div class="calendar-section">
+          <h4>📅 Add to Google Calendar</h4>
+          <div id="cal-auth-section">
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.75rem">Connect your Google account to create the reminder automatically.</p>
+            <button class="cal-btn" onclick="connectGoogle()">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+              Connect Google Calendar
+            </button>
+          </div>
+          <div id="cal-ready-section" style="display:none">
+            <div class="time-row">
+              <div class="field"><label>Start time</label><input type="datetime-local" id="cal-start" /></div>
+              <div class="field"><label>End time</label><input type="datetime-local" id="cal-end" /></div>
+            </div>
+            <button class="cal-btn" id="cal-create-btn" onclick="addToCalendar()">📅 Create calendar reminder</button>
+            <div id="cal-success-msg" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ── Pipeline View ── -->
+  <div id="view-pipeline" style="display:none; padding:1.5rem;">
+    <div style="max-width:1200px;margin:0 auto;">
+      <h2 class="pipeline-title">Client Pipeline</h2>
+      <p class="pipeline-sub">Drag cards between columns to track your deals. Data saved in your browser.</p>
+      <div class="kanban-board" id="kanban-board">
+        <div class="kanban-col">
+          <div class="col-header">Lead <span class="col-count" id="cnt-lead">0</span></div>
+          <div class="col-body" id="col-lead" data-col="lead"
+               ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'lead')"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="col-header">Docs Requested <span class="col-count" id="cnt-docs">0</span></div>
+          <div class="col-body" id="col-docs" data-col="docs"
+               ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'docs')"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="col-header">Submitted <span class="col-count" id="cnt-submitted">0</span></div>
+          <div class="col-body" id="col-submitted" data-col="submitted"
+               ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'submitted')"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="col-header">Offer Received <span class="col-count" id="cnt-offer">0</span></div>
+          <div class="col-body" id="col-offer" data-col="offer"
+               ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'offer')"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="col-header">Closed <span class="col-count" id="cnt-closed">0</span></div>
+          <div class="col-body" id="col-closed" data-col="closed"
+               ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'closed')"></div>
         </div>
       </div>
     </div>
-  </main>
+  </div>
 </div>
 
 <div id="toast"></div>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
+  // ── State ──
   let currentUser = null, googleAccessToken = null, analysisResult = null;
   let activeTab = 'text', imageBase64 = null, imageMimeType = null;
+  let dragCardId = null;
 
+  // ── Auth ──
   function loadUser() {
     try { currentUser = JSON.parse(localStorage.getItem('chasely_user')); } catch {}
     if (currentUser) showApp();
@@ -212,8 +347,20 @@
     document.getElementById('landing').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     document.getElementById('user-email-pill').textContent = currentUser.email;
+    renderStreak();
+    renderPipeline();
   }
 
+  // ── View switching ──
+  function showView(view, el) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('view-analyse').style.display = view === 'analyse' ? '' : 'none';
+    document.getElementById('view-pipeline').style.display = view === 'pipeline' ? '' : 'none';
+    if (view === 'pipeline') renderPipeline();
+  }
+
+  // ── Signup ──
   document.getElementById('signup-form').addEventListener('submit', async e => {
     e.preventDefault();
     const btn = document.getElementById('signup-btn');
@@ -238,13 +385,15 @@
     }
   });
 
+  // ── Input tabs ──
   function switchTab(tab, el) {
     activeTab = tab;
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); el.classList.add('active');
+    document.querySelectorAll('.input-tab').forEach(t => t.classList.remove('active')); el.classList.add('active');
     document.querySelectorAll('.input-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('panel-' + tab).classList.add('active');
   }
 
+  // ── Image handling ──
   const dropZone = document.getElementById('drop-zone');
   const imgInput = document.getElementById('img-input');
   const previewImg = document.getElementById('preview-img');
@@ -263,6 +412,7 @@
     reader.readAsDataURL(file);
   }
 
+  // ── Analyse ──
   async function analyse() {
     const btn = document.getElementById('analyse-btn');
     const label = document.getElementById('btn-label');
@@ -281,23 +431,64 @@
       const res = await fetch('/api/analyse', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Analysis failed');
-      analysisResult = data.data; showResult(analysisResult);
+      analysisResult = data.data;
+      showResult(analysisResult);
     } catch (err) { showToast(err.message, true); }
     finally { btn.disabled = false; label.textContent = 'Analyse conversation'; }
   }
 
+  function tempBadge(temp) {
+    if (!temp) return '—';
+    const t = temp.toLowerCase();
+    if (t === 'hot') return '<span class="temp-hot">🔥 Hot</span>';
+    if (t === 'warm') return '<span class="temp-warm">☀️ Warm</span>';
+    return '<span class="temp-cold">❄️ Cold</span>';
+  }
+
   function showResult(d) {
     document.getElementById('r-client').textContent = d.clientName || '—';
-    document.getElementById('r-date').textContent = d.followUpDate ? new Date(d.followUpDate+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long',year:'numeric'}) : '—';
+    document.getElementById('r-date').textContent = d.followUpDate
+      ? new Date(d.followUpDate+'T12:00:00').toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'long', year:'numeric'})
+      : '—';
     document.getElementById('r-stage').textContent = d.stage || '—';
-    document.getElementById('r-title').textContent = d.eventTitle || '—';
+    document.getElementById('r-temp').innerHTML = tempBadge(d.temperature);
     document.getElementById('r-summary').textContent = d.summary || '—';
-    if (d.followUpDate) { document.getElementById('cal-start').value = d.followUpDate+'T09:00'; document.getElementById('cal-end').value = d.followUpDate+'T09:30'; }
-    if (googleAccessToken) { document.getElementById('cal-auth-section').style.display='none'; document.getElementById('cal-ready-section').style.display='block'; }
+
+    if (d.followUpDate) {
+      document.getElementById('cal-start').value = d.followUpDate + 'T09:00';
+      document.getElementById('cal-end').value = d.followUpDate + 'T09:30';
+    }
+    if (googleAccessToken) {
+      document.getElementById('cal-auth-section').style.display = 'none';
+      document.getElementById('cal-ready-section').style.display = 'block';
+    }
+
+    // Follow-up message
+    if (d.followUpMessage) {
+      document.getElementById('followup-msg-text').textContent = d.followUpMessage;
+      document.getElementById('followup-section').style.display = 'block';
+    }
+
+    // Pipeline button
+    document.getElementById('pipeline-add-btn').style.display = 'flex';
+
+    // Reset calendar section
+    document.getElementById('cal-success-msg').style.display = 'none';
+    document.getElementById('cal-create-btn').style.display = 'flex';
+    document.getElementById('cal-create-btn').disabled = false;
+    document.getElementById('cal-create-btn').textContent = '📅 Create calendar reminder';
+
     document.getElementById('result-card').style.display = 'block';
     document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
+  // ── Copy follow-up message ──
+  function copyFollowUp() {
+    const text = document.getElementById('followup-msg-text').textContent;
+    navigator.clipboard.writeText(text).then(() => showToast('Message copied!'));
+  }
+
+  // ── Google Calendar ──
   function connectGoogle() {
     const client = google.accounts.oauth2.initTokenClient({
       client_id: '217051624112-8d7fpf3029ekupbgt6pqi85re307s3bh.apps.googleusercontent.com',
@@ -323,12 +514,14 @@
     const end = document.getElementById('cal-end').value;
     if (!start || !end) { showToast('Please set start and end times', true); btn.disabled=false; btn.textContent='📅 Create calendar reminder'; return; }
     try {
+      const description = (analysisResult.summary || '') +
+        '\n\n--- Reminder created by Chasely | chasely-sooty.vercel.app';
       const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${googleAccessToken}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           summary: analysisResult.eventTitle,
-          description: analysisResult.summary || '',
+          description,
           start: { dateTime: new Date(start).toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
           end: { dateTime: new Date(end).toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
           reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: 30 }, { method: 'email', minutes: 60 }] }
@@ -337,16 +530,133 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error?.message || 'Failed to create event');
       const msg = document.getElementById('cal-success-msg');
-      msg.style.display='flex'; msg.className='cal-success';
+      msg.style.display = 'flex'; msg.className = 'cal-success';
       msg.innerHTML = `✅ Event created! <a href="${data.htmlLink}" target="_blank" rel="noopener">Open in Google Calendar →</a>`;
-      btn.style.display='none'; showToast('Calendar event created!');
+      btn.style.display = 'none';
+      showToast('Calendar event created!');
+      updateStreak();
+      addToPipeline(true);
     } catch (err) { showToast(err.message, true); btn.disabled=false; btn.textContent='📅 Create calendar reminder'; }
   }
 
-  function showToast(msg, isError=false) {
+  // ── Share WhatsApp ──
+  function shareWhatsApp() {
+    const msg = encodeURIComponent("Hey! I've been using this free tool called Chasely that turns WhatsApp chats into Google Calendar reminders automatically. Really useful for follow-ups. Try it free here: https://chasely-sooty.vercel.app");
+    window.open('https://wa.me/?text=' + msg, '_blank');
+  }
+
+  // ── Streak ──
+  function getStreak() {
+    try { return JSON.parse(localStorage.getItem('chasely_streak')) || { count: 0, lastDate: '' }; } catch { return { count: 0, lastDate: '' }; }
+  }
+  function saveStreak(s) { localStorage.setItem('chasely_streak', JSON.stringify(s)); }
+
+  function updateStreak() {
+    const today = new Date().toISOString().slice(0, 10);
+    const s = getStreak();
+    if (s.lastDate === today) { renderStreak(); return; }
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    s.count = (s.lastDate === yesterday) ? s.count + 1 : 1;
+    s.lastDate = today;
+    saveStreak(s);
+    renderStreak();
+    const milestones = { 3: "3 day streak! You're building great habits 💪", 7: "7 days straight! One week of consistency 🚀", 14: "14 day streak! You're unstoppable 🏆" };
+    if (milestones[s.count]) showToast(milestones[s.count], false, true);
+  }
+
+  function renderStreak() {
+    const s = getStreak();
+    const el = document.getElementById('streak-badge');
+    if (s.count > 0) { el.textContent = `🔥 ${s.count}`; el.style.display = 'inline-block'; }
+    else { el.style.display = 'none'; }
+  }
+
+  // ── Pipeline ──
+  function getPipeline() {
+    try { return JSON.parse(localStorage.getItem('chasely_pipeline')) || []; } catch { return []; }
+  }
+  function savePipeline(cards) { localStorage.setItem('chasely_pipeline', JSON.stringify(cards)); }
+
+  function addToPipeline(silent = false) {
+    if (!analysisResult) return;
+    const cards = getPipeline();
+    const id = Date.now().toString();
+    cards.push({
+      id,
+      clientName: analysisResult.clientName || 'Unknown',
+      stage: analysisResult.stage || '',
+      followUpDate: analysisResult.followUpDate || '',
+      temperature: analysisResult.temperature || 'Warm',
+      eventTitle: analysisResult.eventTitle || '',
+      status: 'lead'
+    });
+    savePipeline(cards);
+    renderPipeline();
+    if (!silent) showToast('Added to pipeline!');
+  }
+
+  function deleteCard(id) {
+    const cards = getPipeline().filter(c => c.id !== id);
+    savePipeline(cards);
+    renderPipeline();
+  }
+
+  function renderPipeline() {
+    const cols = ['lead', 'docs', 'submitted', 'offer', 'closed'];
+    const cards = getPipeline();
+    cols.forEach(col => {
+      const el = document.getElementById('col-' + col);
+      if (!el) return;
+      const colCards = cards.filter(c => c.status === col);
+      document.getElementById('cnt-' + col).textContent = colCards.length;
+      el.innerHTML = colCards.length === 0
+        ? '<div style="text-align:center;color:var(--muted);font-size:0.8rem;padding:1rem 0">Drop cards here</div>'
+        : colCards.map(c => `
+          <div class="pipeline-card" draggable="true"
+               ondragstart="onDragStart(event,'${c.id}')"
+               ondragend="onDragEnd(event)"
+               id="pc-${c.id}">
+            <div class="pc-name">${c.clientName}</div>
+            <div class="pc-stage">${c.stage}</div>
+            <div class="pc-footer">
+              <span>${c.followUpDate ? new Date(c.followUpDate+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : ''}</span>
+              <div style="display:flex;align-items:center;gap:0.4rem">
+                ${tempBadge(c.temperature)}
+                <button class="pc-delete" onclick="deleteCard('${c.id}')">✕</button>
+              </div>
+            </div>
+          </div>`).join('');
+    });
+  }
+
+  // ── Drag & Drop ──
+  function onDragStart(e, id) {
+    dragCardId = id;
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => { const el = document.getElementById('pc-' + id); if (el) el.classList.add('dragging'); }, 0);
+  }
+  function onDragEnd(e) {
+    if (dragCardId) { const el = document.getElementById('pc-' + dragCardId); if (el) el.classList.remove('dragging'); }
+  }
+  function onDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+  function onDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+  function onDrop(e, col) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    if (!dragCardId) return;
+    const cards = getPipeline();
+    const card = cards.find(c => c.id === dragCardId);
+    if (card) { card.status = col; savePipeline(cards); renderPipeline(); }
+    dragCardId = null;
+  }
+
+  // ── Toast ──
+  function showToast(msg, isError = false, isSuccess = false) {
     const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'show'+(isError?' error':'');
-    clearTimeout(t._timer); t._timer = setTimeout(() => { t.className=''; }, 3000);
+    t.textContent = msg;
+    t.className = 'show' + (isError ? ' error' : isSuccess ? ' success' : '');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.className = ''; }, 3500);
   }
 
   loadUser();
