@@ -136,6 +136,32 @@
     .pc-delete:hover { color: var(--danger); background: rgba(239,68,68,0.1); }
     .empty-pipeline { text-align: center; color: var(--muted); padding: 3rem 1rem; font-size: 0.9rem; grid-column: 1/-1; }
 
+    /* ── HISTORY VIEW ── */
+    #view-history { max-width: 760px; margin: 2.5rem auto; padding: 0 1.5rem; }
+    #view-history h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.4rem; }
+    #view-history .desc { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .history-actions { display: flex; justify-content: flex-end; margin-bottom: 1rem; }
+    .clear-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 6px; padding: 0.35rem 0.75rem; font-size: 0.8rem; cursor: pointer; transition: all 0.15s; }
+    .clear-btn:hover { border-color: var(--danger); color: var(--danger); }
+    .history-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .history-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; cursor: pointer; transition: border-color 0.15s; }
+    .history-item:hover { border-color: var(--accent); }
+    .hi-left { flex: 1; min-width: 0; }
+    .hi-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.2rem; }
+    .hi-stage { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hi-meta { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+    .hi-date { font-size: 0.78rem; color: var(--muted); }
+    .hi-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; flex-shrink: 0; }
+    .hi-time { font-size: 0.75rem; color: var(--muted); }
+    .hi-delete { background: none; border: none; color: var(--muted); font-size: 0.8rem; cursor: pointer; padding: 0.15rem 0.4rem; border-radius: 4px; }
+    .hi-delete:hover { color: var(--danger); background: rgba(239,68,68,0.1); }
+    .history-empty { text-align: center; color: var(--muted); padding: 4rem 1rem; font-size: 0.95rem; }
+
+    /* ── LANDING SIGN-IN TOGGLE ── */
+    .auth-toggle { margin-top: 1.25rem; text-align: center; font-size: 0.85rem; color: var(--muted); }
+    .auth-toggle button { background: none; border: none; color: var(--accent); font-size: 0.85rem; cursor: pointer; font-weight: 500; padding: 0; }
+    .auth-toggle button:hover { color: var(--accent-light); }
+
     /* ── TOAST ── */
     #toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(4rem); background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1.25rem; font-size: 0.9rem; box-shadow: 0 8px 32px rgba(0,0,0,0.4); transition: transform 0.25s ease, opacity 0.25s; opacity: 0; pointer-events: none; z-index: 999; max-width: 90vw; text-align: center; }
     #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -165,33 +191,49 @@
     <div class="feature"><span>📅</span> One-click Google Calendar</div>
   </div>
   <div class="card">
-    <h2>Get early access</h2>
-    <p>Free for sales professionals during beta.</p>
-    <form id="signup-form">
-      <div class="row">
-        <div class="field"><label>First name *</label><input type="text" id="f-first" placeholder="Ahmed" required /></div>
-        <div class="field"><label>Last name</label><input type="text" id="f-last" placeholder="Al-Rashid" /></div>
-      </div>
-      <div class="field"><label>Work email *</label><input type="email" id="f-email" placeholder="ahmed@company.com" required /></div>
-      <div class="row">
-        <div class="field"><label>Phone</label><input type="tel" id="f-phone" placeholder="+971 50 000 0000" /></div>
-        <div class="field">
-          <label>Role *</label>
-          <select id="f-role" required>
-            <option value="">Select…</option>
-            <option>Sales Rep</option>
-            <option>Account Executive</option>
-            <option>BDR / SDR</option>
-            <option>Sales Manager</option>
-            <option>Founder / CEO</option>
-            <option>Other</option>
-          </select>
+    <!-- Sign up form -->
+    <div id="signup-panel">
+      <h2>Get early access</h2>
+      <p>Free for sales professionals during beta.</p>
+      <form id="signup-form">
+        <div class="row">
+          <div class="field"><label>First name *</label><input type="text" id="f-first" placeholder="Ahmed" required /></div>
+          <div class="field"><label>Last name</label><input type="text" id="f-last" placeholder="Al-Rashid" /></div>
         </div>
-      </div>
-      <div class="field"><label>Company</label><input type="text" id="f-company" placeholder="Acme Corp" /></div>
-      <button type="submit" class="btn" id="signup-btn">Get started →</button>
-      <div id="signup-error" class="error-msg"></div>
-    </form>
+        <div class="field"><label>Work email *</label><input type="email" id="f-email" placeholder="ahmed@company.com" required /></div>
+        <div class="row">
+          <div class="field"><label>Phone</label><input type="tel" id="f-phone" placeholder="+971 50 000 0000" /></div>
+          <div class="field">
+            <label>Role *</label>
+            <select id="f-role" required>
+              <option value="">Select…</option>
+              <option>Sales Rep</option>
+              <option>Account Executive</option>
+              <option>BDR / SDR</option>
+              <option>Sales Manager</option>
+              <option>Founder / CEO</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Company</label><input type="text" id="f-company" placeholder="Acme Corp" /></div>
+        <button type="submit" class="btn" id="signup-btn">Get started →</button>
+        <div id="signup-error" class="error-msg"></div>
+      </form>
+      <div class="auth-toggle">Already have an account? <button onclick="showAuthPanel('login')">Sign in</button></div>
+    </div>
+
+    <!-- Sign in form -->
+    <div id="login-panel" style="display:none">
+      <h2>Welcome back</h2>
+      <p>Enter your email to sign in.</p>
+      <form id="login-form">
+        <div class="field"><label>Work email *</label><input type="email" id="l-email" placeholder="ahmed@company.com" required /></div>
+        <button type="submit" class="btn" id="login-btn">Sign in →</button>
+        <div id="login-error" class="error-msg"></div>
+      </form>
+      <div class="auth-toggle">Don't have an account? <button onclick="showAuthPanel('signup')">Sign up</button></div>
+    </div>
   </div>
 </section>
 
@@ -202,6 +244,7 @@
     <nav class="app-nav">
       <button class="nav-tab active" onclick="showView('analyse', this)">Analyse</button>
       <button class="nav-tab" onclick="showView('pipeline', this)">Pipeline</button>
+      <button class="nav-tab" onclick="showView('history', this)">History</button>
     </nav>
     <div class="header-right">
       <span id="streak-badge" class="streak-badge"></span>
@@ -321,6 +364,15 @@
       </div>
     </div>
   </div>
+  <!-- ── History View ── -->
+  <div id="view-history" style="display:none">
+    <h2>Analysis History</h2>
+    <p class="desc">All past conversations you've analysed, newest first. Click any to restore it.</p>
+    <div class="history-actions">
+      <button class="clear-btn" onclick="clearHistory()">Clear all history</button>
+    </div>
+    <div class="history-list" id="history-list"></div>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -351,14 +403,40 @@
     renderPipeline();
   }
 
+  // ── Landing auth toggle ──
+  function showAuthPanel(panel) {
+    document.getElementById('signup-panel').style.display = panel === 'signup' ? '' : 'none';
+    document.getElementById('login-panel').style.display = panel === 'login' ? '' : 'none';
+  }
+
   // ── View switching ──
   function showView(view, el) {
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
     document.getElementById('view-analyse').style.display = view === 'analyse' ? '' : 'none';
     document.getElementById('view-pipeline').style.display = view === 'pipeline' ? '' : 'none';
+    document.getElementById('view-history').style.display = view === 'history' ? '' : 'none';
     if (view === 'pipeline') renderPipeline();
+    if (view === 'history') renderHistory();
   }
+
+  // ── Sign in ──
+  document.getElementById('login-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('login-btn');
+    const errEl = document.getElementById('login-error');
+    errEl.textContent = ''; btn.disabled = true; btn.textContent = 'Signing in…';
+    const email = document.getElementById('l-email').value.trim();
+    try {
+      const res = await fetch('/api/login', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Login failed');
+      saveUser({ email: data.user.email, firstName: data.user.first_name });
+      showApp();
+    } catch (err) {
+      errEl.textContent = err.message; btn.disabled = false; btn.textContent = 'Sign in →';
+    }
+  });
 
   // ── Signup ──
   document.getElementById('signup-form').addEventListener('submit', async e => {
@@ -433,6 +511,7 @@
       if (!res.ok) throw new Error(data.error || 'Analysis failed');
       analysisResult = data.data;
       showResult(analysisResult);
+      saveToHistory(analysisResult);
     } catch (err) { showToast(err.message, true); }
     finally { btn.disabled = false; label.textContent = 'Analyse conversation'; }
   }
@@ -627,6 +706,58 @@
             </div>
           </div>`).join('');
     });
+  }
+
+  // ── History ──
+  function getHistory() {
+    try { return JSON.parse(localStorage.getItem('chasely_history')) || []; } catch { return []; }
+  }
+  function saveToHistory(result) {
+    const history = getHistory();
+    history.unshift({ id: Date.now().toString(), timestamp: new Date().toISOString(), ...result });
+    if (history.length > 50) history.pop();
+    localStorage.setItem('chasely_history', JSON.stringify(history));
+  }
+  function deleteHistoryItem(id) {
+    const history = getHistory().filter(h => h.id !== id);
+    localStorage.setItem('chasely_history', JSON.stringify(history));
+    renderHistory();
+  }
+  function clearHistory() {
+    if (!confirm('Clear all history?')) return;
+    localStorage.removeItem('chasely_history');
+    renderHistory();
+  }
+  function restoreFromHistory(id) {
+    const item = getHistory().find(h => h.id === id);
+    if (!item) return;
+    const { id: _, timestamp, ...result } = item;
+    analysisResult = result;
+    showView('analyse', document.querySelector('.nav-tab'));
+    showResult(result);
+  }
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    const history = getHistory();
+    if (history.length === 0) {
+      list.innerHTML = '<div class="history-empty">No analyses yet. Go to Analyse and paste a conversation to get started.</div>';
+      return;
+    }
+    list.innerHTML = history.map(h => `
+      <div class="history-item" onclick="restoreFromHistory('${h.id}')">
+        <div class="hi-left">
+          <div class="hi-name">${h.clientName || 'Unknown client'}</div>
+          <div class="hi-stage">${h.stage || '—'}</div>
+          <div class="hi-meta">
+            ${h.followUpDate ? `<span class="hi-date">📅 ${new Date(h.followUpDate+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span>` : ''}
+            ${tempBadge(h.temperature)}
+          </div>
+        </div>
+        <div class="hi-right">
+          <span class="hi-time">${new Date(h.timestamp).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})} · ${new Date(h.timestamp).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span>
+          <button class="hi-delete" onclick="event.stopPropagation();deleteHistoryItem('${h.id}')">✕</button>
+        </div>
+      </div>`).join('');
   }
 
   // ── Drag & Drop ──
