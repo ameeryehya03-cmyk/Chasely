@@ -183,7 +183,7 @@
             <div class="field"><label>Start time</label><input type="datetime-local" id="cal-start" /></div>
             <div class="field"><label>End time</label><input type="datetime-local" id="cal-end" /></div>
           </div>
-          <button class="cal-btn" id="cal-create-btn" onclick="createEvent()">📅 Create calendar reminder</button>
+          <button class="cal-btn" id="cal-create-btn" onclick="addToCalendar()">📅 Create calendar reminder</button>
           <div id="cal-success-msg" style="display:none"></div>
         </div>
       </div>
@@ -314,7 +314,7 @@
     client.requestAccessToken();
   }
 
-  async function createEvent() {
+  async function addToCalendar() {
     if (!analysisResult) { showToast('Please analyse a conversation first', true); return; }
     if (!googleAccessToken) { showToast('Please connect Google Calendar first', true); return; }
     const btn = document.getElementById('cal-create-btn');
