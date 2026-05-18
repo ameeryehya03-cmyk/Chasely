@@ -80,10 +80,19 @@
 
     /* ── RESULT CARD ── */
     #result-card { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; margin-top: 2rem; }
-    #result-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; }
+    .result-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .result-card-header h3 { font-size: 1.1rem; font-weight: 700; }
+    .edit-toggle-btn { background: var(--border); border: none; color: var(--text); border-radius: 6px; padding: 0.3rem 0.75rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+    .edit-toggle-btn:hover { background: #2a2a3e; }
+    .edit-toggle-btn.active { background: var(--accent); color: #fff; }
     .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
     .result-field .label { font-size: 0.75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
     .result-field .value { font-size: 0.95rem; font-weight: 500; }
+    .result-field .edit-input { font-size: 0.9rem; background: var(--bg); border: 1px solid var(--accent); border-radius: 6px; color: var(--text); padding: 0.4rem 0.6rem; width: 100%; outline: none; display: none; }
+    .result-field .edit-textarea { font-size: 0.88rem; background: var(--bg); border: 1px solid var(--accent); border-radius: 6px; color: var(--text); padding: 0.5rem 0.6rem; width: 100%; outline: none; resize: vertical; min-height: 70px; font-family: inherit; line-height: 1.5; display: none; }
+    .result-field.editing .value { display: none; }
+    .result-field.editing .edit-input { display: block; }
+    .result-field.editing .edit-textarea { display: block; }
     .summary-field { grid-column: 1 / -1; }
     .summary-field .value { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
     .badge { display: inline-block; background: rgba(108,99,255,0.15); color: var(--accent-light); border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.8rem; font-weight: 600; }
@@ -100,6 +109,9 @@
     .copy-btn { background: var(--border); border: none; color: var(--text); border-radius: 6px; padding: 0.3rem 0.75rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: background 0.15s; }
     .copy-btn:hover { background: #2a2a3e; }
     .followup-msg-box { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; font-size: 0.9rem; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
+    .followup-msg-box[contenteditable="true"] { border-color: var(--accent); outline: none; cursor: text; }
+    .remove-img-btn { display: none; margin-top: 0.6rem; background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 6px; padding: 0.3rem 0.75rem; font-size: 0.8rem; cursor: pointer; transition: all 0.15s; }
+    .remove-img-btn:hover { border-color: var(--danger); color: var(--danger); }
 
     /* Pipeline add button */
     .pipeline-add-btn { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.65rem; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--muted); font-size: 0.9rem; font-weight: 500; cursor: pointer; margin-top: 0.75rem; transition: all 0.15s; }
@@ -277,6 +289,7 @@
         </div>
         <input type="file" id="img-input" accept="image/*" style="display:none" />
         <img id="preview-img" alt="Preview" />
+        <button class="remove-img-btn" id="remove-img-btn" onclick="removeImage()">✕ Remove image</button>
       </div>
       <button class="analyse-btn" id="analyse-btn" onclick="analyse()">
         <span id="btn-label">Analyse conversation</span>
@@ -284,13 +297,40 @@
 
       <!-- Result card -->
       <div id="result-card">
-        <h3>✅ Follow-up details</h3>
+        <div class="result-card-header">
+          <h3>✅ Follow-up details</h3>
+          <button class="edit-toggle-btn" id="edit-toggle-btn" onclick="toggleEdit()">✏️ Edit</button>
+        </div>
         <div class="result-grid">
-          <div class="result-field"><div class="label">Client</div><div class="value" id="r-client">—</div></div>
-          <div class="result-field"><div class="label">Follow-up date</div><div class="value" id="r-date">—</div></div>
-          <div class="result-field"><div class="label">Stage</div><div class="value"><span class="badge" id="r-stage">—</span></div></div>
-          <div class="result-field"><div class="label">Lead temperature</div><div class="value" id="r-temp">—</div></div>
-          <div class="result-field summary-field"><div class="label">Summary</div><div class="value" id="r-summary">—</div></div>
+          <div class="result-field" id="rf-client">
+            <div class="label">Client</div>
+            <div class="value" id="r-client">—</div>
+            <input class="edit-input" id="e-client" type="text" oninput="syncEdit('clientName','e-client')" />
+          </div>
+          <div class="result-field" id="rf-date">
+            <div class="label">Follow-up date</div>
+            <div class="value" id="r-date">—</div>
+            <input class="edit-input" id="e-date" type="date" oninput="syncEditDate('e-date')" />
+          </div>
+          <div class="result-field" id="rf-stage">
+            <div class="label">Stage</div>
+            <div class="value"><span class="badge" id="r-stage">—</span></div>
+            <input class="edit-input" id="e-stage" type="text" oninput="syncEdit('stage','e-stage')" />
+          </div>
+          <div class="result-field" id="rf-temp">
+            <div class="label">Lead temperature</div>
+            <div class="value" id="r-temp">—</div>
+            <select class="edit-input" id="e-temp" onchange="syncEditTemp()">
+              <option value="Hot">🔥 Hot</option>
+              <option value="Warm">☀️ Warm</option>
+              <option value="Cold">❄️ Cold</option>
+            </select>
+          </div>
+          <div class="result-field summary-field" id="rf-summary">
+            <div class="label">Summary</div>
+            <div class="value" id="r-summary">—</div>
+            <textarea class="edit-textarea" id="e-summary" oninput="syncEdit('summary','e-summary')"></textarea>
+          </div>
         </div>
 
         <!-- Follow-up message -->
@@ -485,9 +525,18 @@
     const reader = new FileReader();
     reader.onload = ev => {
       imageBase64 = ev.target.result.split(',')[1]; imageMimeType = file.type;
-      previewImg.src = ev.target.result; previewImg.style.display = 'block'; dropZone.style.display = 'none';
+      previewImg.src = ev.target.result; previewImg.style.display = 'block';
+      dropZone.style.display = 'none';
+      document.getElementById('remove-img-btn').style.display = 'inline-block';
     };
     reader.readAsDataURL(file);
+  }
+
+  function removeImage() {
+    imageBase64 = null; imageMimeType = null;
+    previewImg.src = ''; previewImg.style.display = 'none';
+    dropZone.style.display = ''; imgInput.value = '';
+    document.getElementById('remove-img-btn').style.display = 'none';
   }
 
   // ── Analyse ──
@@ -533,9 +582,23 @@
     document.getElementById('r-temp').innerHTML = tempBadge(d.temperature);
     document.getElementById('r-summary').textContent = d.summary || '—';
 
+    // Populate edit inputs
+    document.getElementById('e-client').value = d.clientName || '';
+    document.getElementById('e-date').value = d.followUpDate || '';
+    document.getElementById('e-stage').value = d.stage || '';
+    document.getElementById('e-temp').value = d.temperature || 'Warm';
+    document.getElementById('e-summary').value = d.summary || '';
+
+    // Exit edit mode when showing a fresh result
+    setEditMode(false);
+
     if (d.followUpDate) {
-      document.getElementById('cal-start').value = d.followUpDate + 'T09:00';
-      document.getElementById('cal-end').value = d.followUpDate + 'T09:30';
+      const time = d.followUpTime || '09:00';
+      const [h, m] = time.split(':');
+      const endH = String(parseInt(h) + (parseInt(m) >= 30 ? 1 : 0)).padStart(2,'0');
+      const endM = String((parseInt(m) + 30) % 60).padStart(2,'0');
+      document.getElementById('cal-start').value = d.followUpDate + 'T' + time;
+      document.getElementById('cal-end').value = d.followUpDate + 'T' + endH + ':' + endM;
     }
     if (googleAccessToken) {
       document.getElementById('cal-auth-section').style.display = 'none';
@@ -544,7 +607,10 @@
 
     // Follow-up message
     if (d.followUpMessage) {
-      document.getElementById('followup-msg-text').textContent = d.followUpMessage;
+      const msgEl = document.getElementById('followup-msg-text');
+      msgEl.textContent = d.followUpMessage;
+      msgEl.contentEditable = 'false';
+      msgEl.oninput = () => { if (analysisResult) analysisResult.followUpMessage = msgEl.textContent; };
       document.getElementById('followup-section').style.display = 'block';
     }
 
@@ -565,6 +631,46 @@
   function copyFollowUp() {
     const text = document.getElementById('followup-msg-text').textContent;
     navigator.clipboard.writeText(text).then(() => showToast('Message copied!'));
+  }
+
+  // ── Edit result fields ──
+  let editMode = false;
+  function setEditMode(on) {
+    editMode = on;
+    const btn = document.getElementById('edit-toggle-btn');
+    const fields = ['rf-client','rf-date','rf-stage','rf-temp','rf-summary'];
+    fields.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('editing', on);
+    });
+    const msgBox = document.getElementById('followup-msg-text');
+    msgBox.contentEditable = on ? 'true' : 'false';
+    if (btn) { btn.textContent = on ? '✓ Done' : '✏️ Edit'; btn.classList.toggle('active', on); }
+  }
+  function toggleEdit() { setEditMode(!editMode); }
+
+  function syncEdit(field, inputId) {
+    if (analysisResult) analysisResult[field] = document.getElementById(inputId).value;
+  }
+  function syncEditDate(inputId) {
+    const val = document.getElementById(inputId).value;
+    if (analysisResult) analysisResult.followUpDate = val;
+    document.getElementById('r-date').textContent = val
+      ? new Date(val+'T12:00:00').toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'long', year:'numeric'})
+      : '—';
+    if (val) {
+      const time = analysisResult?.followUpTime || '09:00';
+      const [h, m] = time.split(':');
+      const endH = String(parseInt(h) + (parseInt(m) >= 30 ? 1 : 0)).padStart(2,'0');
+      const endM = String((parseInt(m) + 30) % 60).padStart(2,'0');
+      document.getElementById('cal-start').value = val + 'T' + time;
+      document.getElementById('cal-end').value = val + 'T' + endH + ':' + endM;
+    }
+  }
+  function syncEditTemp() {
+    const val = document.getElementById('e-temp').value;
+    if (analysisResult) analysisResult.temperature = val;
+    document.getElementById('r-temp').innerHTML = tempBadge(val);
   }
 
   // ── Google Calendar ──

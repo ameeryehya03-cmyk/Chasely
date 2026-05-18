@@ -16,6 +16,7 @@ Return exactly:
 {
   "clientName": "name of the person who is NOT the sales rep",
   "followUpDate": "YYYY-MM-DD",
+  "followUpTime": "HH:MM",
   "stage": "one short phrase for what is pending (max 6 words)",
   "eventTitle": "Follow up — [name] re: [topic]",
   "summary": "2-3 sentences: what was discussed and what action is needed next",
@@ -26,6 +27,9 @@ Temperature rules — pick exactly one:
 - "Hot": deal likely to close soon, clear next steps, strong engagement from client
 - "Warm": client is interested but delayed, waiting on something, moderate engagement
 - "Cold": client is unresponsive, vague, long timeline, or low engagement
+followUpTime rules:
+- If a specific time is mentioned in the conversation (e.g. "call at 3pm", "meeting at 10:30"), use that time in 24-hour HH:MM format
+- Otherwise use "09:00"
 If a specific follow-up date is mentioned use it. Otherwise suggest 3 business days from today.`;
 
     let userContent;
