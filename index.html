@@ -315,7 +315,8 @@
   }
 
   async function createEvent() {
-    if (!analysisResult || !googleAccessToken) return;
+    if (!analysisResult) { showToast('Please analyse a conversation first', true); return; }
+    if (!googleAccessToken) { showToast('Please connect Google Calendar first', true); return; }
     const btn = document.getElementById('cal-create-btn');
     btn.disabled = true; btn.textContent = 'Creating…';
     const start = document.getElementById('cal-start').value;
