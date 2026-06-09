@@ -1,7 +1,9 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/:path*" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "crons": [
+    {
+      "path": "/api/cron/google",
+      "schedule": "0 3 * * 1"
+    }
   ]
 }
