@@ -9,6 +9,7 @@ const links = [
   { href: '/duplicates', label: 'Duplicates' },
   { href: '/compliance', label: 'Compliance' },
   { href: '/manual-entry', label: 'Manual Entry' },
+  { href: '/kinley', label: 'Kinley' },
 ]
 
 export default function NavBar() {
